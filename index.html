@@ -1,0 +1,177 @@
+<style>
+.style-1 {
+  padding: 10px;
+  border: solid 5px #c9c9c9;
+  transition: border 0.3s;
+  width: 400px;
+  font-family: "Helvetica", sans-serif;
+  font-size: 14pt;
+}
+.style-1:focus,
+.style-1.focus {
+  border: solid 5px #969696;
+}
+.style-2 {
+	padding: 10px;
+  	border: solid 5px #c9c9c9;
+}
+</style>
+
+<div id="form"></div>
+<div id="result"></div>
+<script src="cities.js"></script>
+<link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
+
+<script>
+function createSynth(){
+	var synth = {};
+	var ac = new AudioContext();
+	var o1 = ac.createOscillator();
+	var o2 = ac.createOscillator();
+	var g1 = ac.createGain();
+	var g2 = ac.createGain();
+	o1.connect(g1);
+	o2.connect(g2);
+	var filter = ac.createBiquadFilter();
+	g1.connect(filter);
+	g2.connect(filter);
+	filter.connect(ac.destination);
+	var waves = ['sine', 'square', 'sawtooth', 'triangle'];
+
+	synth.setParameters = function(mix, o1wave, o2wave, ressonance, cutoff, detune) {
+		var freq = 440; //? mix???
+		o1.type = waves[o1wave]; 
+		o2.type = waves[o2wave]; 
+		o1.frequency.value = freq; 
+		o2.frequency.value = freq + detune;
+		filter.frequency = cutoff * 22050;
+		filter.q = ressonance;
+		//filter.type = ; ??
+		//g1.value = ;
+		//g2.value = 1 - ;
+	}
+
+	synth.start = function(){
+		o1.start();
+		o2.start();
+	}
+	synth.stop = function(){
+		o1.stop();
+		o2.stop();
+	}
+	return synth;
+}
+
+
+var synth = createSynth();
+synth.setParameters(0.7, 1, 3, 0.87, 0.67, 1.3);
+//synth.start();
+//synth.stop();
+
+
+
+</script>
+<div id="map" style="width:100%"></div>
+
+<script src="http://js.arcgis.com/3.14/"></script>
+<script>
+var getData;
+require([
+ "esri/map",
+ "esri/graphic",
+ "esri/layers/GraphicsLayer",
+ "esri/geometry/Point",
+ "esri/symbols/SimpleMarkerSymbol",
+ "esri/InfoTemplate",
+ "esri/geometry/webMercatorUtils",
+ "dojo/domReady!"
+ ],
+ function(Map, Graphic, GraphicsLayer, Point, SimpleMarkerSymbol, InfoTemplate, webMercatorUtils) {
+	var map = new Map("map", {
+		center: [-1.750000000, 52.450000000],
+		zoom: 6,
+		basemap: "topo"
+	});
+  
+ 	var locationLayer;
+    addPoint = function (x,y){
+    	if(!locationLayer){
+    		locationLayer = new GraphicsLayer();	
+    	}
+		var point = new Point(webMercatorUtils.xyToLngLat(x, y));
+		var symbol = new SimpleMarkerSymbol().setColor("#1036DE").setSize(14);
+		var graphic = new Graphic(point, symbol);
+
+		var infoTemplate = new InfoTemplate();
+		infoTemplate.setTitle("Title");
+		infoTemplate.setContent("Text");
+		locationLayer.add(graphic);
+		graphic.setInfoTemplate(infoTemplate);
+		map.addLayer(locationLayer);
+		//map.infoWindow.show();
+ 	}
+
+ 	var search = [
+		{name: "Population", max: 13076300, atr: 'POP', url: "http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=POP_RANK%2C+CITY_NAME%2C+CNTRY_NAME%2C+POP&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token=" },
+
+		{name: "Air pollution", max: 148.9, atr: 'PM_2_5_ANN', url: "http://services6.arcgis.com/C0HVLQJI37vYnazu/arcgis/rest/services/Ambient_outdoor_air_pollution_in_cities_pm25/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
+
+		{name: "Temperature", max: 50, atr: 'Temperature_degC', url: "http://services.arcgis.com/hRUr1F8lE8Jq2uJo/arcgis/rest/services/WeatherConditionsFromMETAR/FeatureServer/0/query?where=StationName+like+%27{{CITY}}%25%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=StationName%2C+Temperature_degC%2C+UTC_DateTime%2C+CloudCover_pc&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
+
+		{name: "GDP", max:73931.54, atr: 'Index_value_displayed_if_2004_not_available_then_2001_was_used', url: "http://services.arcgis.com/LcQjj2sL7Txk9Lag/arcgis/rest/services/GDP_per_capita_in_2004_[EUR]/FeatureServer/0/query?where=city_name%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=value_in_2001%2C+GDP_per_head_EUR_2004%2C+Index_value_displayed_if_2004_not_available_then_2001_was_used&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="}
+	];
+
+	
+	function httpGet(theUrl)
+	{
+	    var xmlHttp = new XMLHttpRequest();
+	    xmlHttp.open( "GET", theUrl, false ); // false for synchronous request
+	    xmlHttp.send( null );
+	    return xmlHttp.responseText;
+	}
+
+	function buildForm(){
+		var options = '<center><input class="style-1" id="city-input" list="cities" onchange="getData()">\n<datalist id="cities">';
+		for(i = 0; i< cities.length; i++){
+			options += '<option value="'+cities[i].name+'" name="'+i+'" id="'+i+'"></option>\n';
+		}
+		options += '</datalist></center>'
+		document.getElementById("form").innerHTML = options;
+	}
+	buildForm();
+
+	getData = function(){
+		if(locationLayer){
+			locationLayer.clear();
+		}
+		var loading = "<img src='loading.gif'/>";
+		var resultdiv = document.getElementById("result");
+		resultdiv.innerHTML = loading;
+
+		var name = document.getElementById("city-input").value;
+		var obj = document.querySelectorAll("option[value='"+name+"']");
+		var id = obj[0].id;
+		var names = name.split(',');
+		var city_name = names[0];
+		var result_str = "";
+		var result = [];
+		for(i = 0; i< search.length; i++){
+			var json = httpGet((search[i].url).replace('{{CITY}}',city_name));
+			var value = (JSON.parse(json)).features[0].attributes[search[i].atr];
+			console.log(value);
+			var norm_value = value / search[i].max;
+			result_str += search[i].name+ ": "+norm_value+"<br/>";
+			result[i] = {name: search[i].name, value: norm_value}
+		}
+		resultdiv.innerHTML = result_str;
+
+		map.centerAndZoom(webMercatorUtils.xyToLngLat(cities[id].position.x,cities[id].position.y), 7);
+		addPoint(cities[id].position.x,cities[id].position.y);
+		return result;
+	}
+
+});
+
+
+</script>
+
