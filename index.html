@@ -26,8 +26,16 @@ input { text-align: center;
 	color: #c52d2f;
 	font-size: 30pt;
 }
-.result{
+#result{
 	width: 100%;
+	background-color: #c52d2f;
+	color: #fff;
+}
+.res-table{
+	border: 0px;
+	color: #fff;
+	width: 100%;
+	text-align: center;
 }
 </style>
 <html>
@@ -150,7 +158,7 @@ require([
 
 		{name: "Air pollution", max: 148.9, atr: 'PM_2_5_ANN', url: "http://services6.arcgis.com/C0HVLQJI37vYnazu/arcgis/rest/services/Ambient_outdoor_air_pollution_in_cities_pm25/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
 
-		{name: "Temperature", max: 50, atr: 'Temperature_degC', url: "http://services.arcgis.com/hRUr1F8lE8Jq2uJo/arcgis/rest/services/WeatherConditionsFromMETAR/FeatureServer/0/query?where=StationName+like+%27{{CITY}}%25%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=StationName%2C+Temperature_degC%2C+UTC_DateTime%2C+CloudCover_pc&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
+		{name: "Temperature", max: 45, atr: 'Temperature_degC', url: "http://services.arcgis.com/hRUr1F8lE8Jq2uJo/arcgis/rest/services/WeatherConditionsFromMETAR/FeatureServer/0/query?where=StationName+like+%27{{CITY}}%25%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=StationName%2C+Temperature_degC%2C+UTC_DateTime%2C+CloudCover_pc&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
 
 		{name: "GDP", max:73931.54, atr: 'Index_value_displayed_if_2004_not_available_then_2001_was_used', url: "http://services.arcgis.com/LcQjj2sL7Txk9Lag/arcgis/rest/services/GDP_per_capita_in_2004_[EUR]/FeatureServer/0/query?where=city_name%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=value_in_2001%2C+GDP_per_head_EUR_2004%2C+Index_value_displayed_if_2004_not_available_then_2001_was_used&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="}
 	];
@@ -187,21 +195,26 @@ require([
 		var id = obj[0].id;
 		var names = name.split(',');
 		var city_name = names[0];
-		var result_str = "";
+		var result_str = "<table class='res-table'><tr>";
 		var result = [];
 		for(i = 0; i< search.length; i++){
 			var json = httpGet((search[i].url).replace('{{CITY}}',city_name));
 			var value = (JSON.parse(json)).features[0].attributes[search[i].atr];
 			console.log(value);
 			var norm_value = value / search[i].max;
-			result_str += search[i].name+ ": "+norm_value+"<br/>";
-			result[i] = {name: search[i].name, value: norm_value}
+			result_str += "<td>"+search[i].name+ ": "+value+"</td>";
+
+			result[i] = norm_value;
 		}
+		result_str += "</tr></table>"
 		resultdiv.innerHTML = result_str;
 
 		map.centerAndZoom(webMercatorUtils.xyToLngLat(cities[id].position.x,cities[id].position.y), 7);
 		addPoint(cities[id].position.x,cities[id].position.y);
-		return result;
+
+		// DO STUFF WITH RESULT, CALL SYNTH THINGIES
+		// result;
+		// result is an array 
 	}
 
 });
