@@ -146,13 +146,12 @@ require([
 		var symbol = new SimpleMarkerSymbol().setColor("#1036DE").setSize(14);
 		var graphic = new Graphic(point, symbol);
 
-		var infoTemplate = new InfoTemplate();
+		/*var infoTemplate = new InfoTemplate();
 		infoTemplate.setTitle("Title");
 		infoTemplate.setContent("Text");
+		graphic.setInfoTemplate(infoTemplate);*/
 		locationLayer.add(graphic);
-		graphic.setInfoTemplate(infoTemplate);
 		map.addLayer(locationLayer);
-		//map.infoWindow.show();
  	}
 
  	var search = [
