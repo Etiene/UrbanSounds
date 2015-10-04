@@ -104,24 +104,29 @@ var setFreq = null;
 /*** AUDIO ****/
 var midi_note;
 var detune;
+var ac;
+var vol;
 function createSynth(){
 	var synth = {};
-	var ac = new AudioContext();
+	ac = new AudioContext();
 	var o1 = ac.createOscillator();
 	var o2 = ac.createOscillator();
 	var g1 = ac.createGain();
 	var g2 = ac.createGain();
+	vol = ac.createGain();
+	vol.gain.value = 0;
 	o1.connect(g1);
 	o2.connect(g2);
 	var filter = ac.createBiquadFilter();
 	g1.connect(filter);
 	g2.connect(filter);
-	filter.connect(ac.destination);
+	filter.connect(vol);
+	vol.connect(ac.destination);
 	var waves = ['sine', 'square', 'sawtooth', 'triangle'];
 
   	setFreq = function(f){
-			o1.frequency.value = f;
-			o2.frequency.value = f + detune;
+			o1.frequency.value = Math.min(f,22050);
+			o2.frequency.value = Math.min(f,22050) + detune;
   		}
 
 	synth.setParameters = function(mix, o1wave, o2wave, ressonance, cutoff, d) {
@@ -157,14 +162,18 @@ var synth = createSynth();
 //synth.stop();
 
 document.onkeypress = function(e){
-	console.log(e.keyCode);
+	console.log(ac.currentTime,ac.currentTime+1);
 	frequency = mtof(keymap[e.keyCode]);
+	vol.gain.linearRampToValueAtTime(1,ac.currentTime+0.1);
+	vol.gain.linearRampToValueAtTime(0,ac.currentTime+1);
   setFreq(frequency);
 }
 
 function mtof(v){
   return (440/32)*(Math.pow(2,((v-9)/12)));
 }
+
+
 
 
 /***** MAP & FORM *****/
