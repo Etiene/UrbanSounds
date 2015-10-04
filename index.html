@@ -1,31 +1,59 @@
 <style>
+
+input { text-align: center; 
+}
 .style-1 {
   padding: 10px;
   border: solid 5px #c9c9c9;
   transition: border 0.3s;
   width: 400px;
-  font-family: "Helvetica", sans-serif;
   font-size: 14pt;
+  border-radius: 30px;
 }
 .style-1:focus,
 .style-1.focus {
   border: solid 5px #969696;
+  border-radius: 30px;
 }
 .style-2 {
 	padding: 10px;
   	border: solid 5px #c9c9c9;
+}
+#form{
+	padding: 20px;
+}
+.headername{
+	color: #c52d2f;
+	font-size: 30pt;
+}
+.result{
+	width: 100%;
 }
 </style>
 <html>
 <head>
 	<title>Urban Sounds</title>
 	<link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
+	<!-- core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/animate.min.css" rel="stylesheet">
+    <link href="css/prettyPhoto.css" rel="stylesheet">
+    <link href="css/main.css" rel="stylesheet">
+    <link href="css/responsive.css" rel="stylesheet">
 </head>
-<body>
+<body class="homepage">
 
-<div id="form"></div>
+<header id="header">
+    <div class="top-bar">
+        <div class="container">
+
+			<!--<p class="headername">Urban Sounds</p>--> <div id="form"></div>
+		</div>
+	</div>
+</header>
+
 <div id="result"></div>
-<div id="map" style="width:100%"></div>
+<div id="map" style="width:100%; height: 100%"></div>
 
 <script src="cities.js"></script>
 <script src="http://js.arcgis.com/3.14/"></script>
@@ -137,7 +165,7 @@ require([
 	}
 
 	function buildForm(){
-		var options = '<center><input class="style-1" id="city-input" list="cities" onchange="getData()">\n<datalist id="cities">';
+		var options = '<center><input placeholder="UrbanSounds" class="style-1" id="city-input" list="cities" onchange="getData()">\n<datalist id="cities">';
 		for(i = 0; i< cities.length; i++){
 			options += '<option value="'+cities[i].name+'" name="'+i+'" id="'+i+'"></option>\n';
 		}
@@ -177,7 +205,6 @@ require([
 	}
 
 });
-
 
 </script>
 </body>
