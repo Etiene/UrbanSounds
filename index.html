@@ -2,16 +2,17 @@
 
 input { text-align: center; 
 }
-.style-1 {
+.city-input {
   padding: 10px;
+  padding-left: 25px;
   border: solid 5px #c9c9c9;
   transition: border 0.3s;
   width: 400px;
   font-size: 14pt;
   border-radius: 30px;
 }
-.style-1:focus,
-.style-1.focus {
+.city-input:focus,
+.city-input.focus {
   border: solid 5px #969696;
   border-radius: 30px;
 }
@@ -40,6 +41,7 @@ input { text-align: center;
 </style>
 <html>
 <head>
+	<meta charset="utf-8">
 	<title>Urban Sounds</title>
 	<link rel="stylesheet" href="http://js.arcgis.com/3.14/esri/css/esri.css">
 	<!-- core CSS -->
@@ -154,13 +156,13 @@ require([
  	}
 
  	var search = [
-		{name: "Population", max: 13076300, atr: 'POP', url: "http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=POP_RANK%2C+CITY_NAME%2C+CNTRY_NAME%2C+POP&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token=" },
+		{name: "Population", max: 13076300, unit: 'habitants', atr: 'POP', url: "http://services.arcgis.com/P3ePLMYs2RVChkJx/ArcGIS/rest/services/World_Cities/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=POP_RANK%2C+CITY_NAME%2C+CNTRY_NAME%2C+POP&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token=" },
 
-		{name: "Air pollution", max: 148.9, atr: 'PM_2_5_ANN', url: "http://services6.arcgis.com/C0HVLQJI37vYnazu/arcgis/rest/services/Ambient_outdoor_air_pollution_in_cities_pm25/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
+		{name: "Air pollution", max: 148.9, unit: 'AQI PM2.5', atr: 'PM_2_5_ANN', url: "http://services6.arcgis.com/C0HVLQJI37vYnazu/arcgis/rest/services/Ambient_outdoor_air_pollution_in_cities_pm25/FeatureServer/0/query?where=CITY_NAME%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=*&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
 
-		{name: "Temperature", max: 45, atr: 'Temperature_degC', url: "http://services.arcgis.com/hRUr1F8lE8Jq2uJo/arcgis/rest/services/WeatherConditionsFromMETAR/FeatureServer/0/query?where=StationName+like+%27{{CITY}}%25%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=StationName%2C+Temperature_degC%2C+UTC_DateTime%2C+CloudCover_pc&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
+		{name: "Temperature", max: 45, unit: '°C', atr: 'Temperature_degC', url: "http://services.arcgis.com/hRUr1F8lE8Jq2uJo/arcgis/rest/services/WeatherConditionsFromMETAR/FeatureServer/0/query?where=StationName+like+%27{{CITY}}%25%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=StationName%2C+Temperature_degC%2C+UTC_DateTime%2C+CloudCover_pc&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="},
 
-		{name: "GDP", max:73931.54, atr: 'Index_value_displayed_if_2004_not_available_then_2001_was_used', url: "http://services.arcgis.com/LcQjj2sL7Txk9Lag/arcgis/rest/services/GDP_per_capita_in_2004_[EUR]/FeatureServer/0/query?where=city_name%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=value_in_2001%2C+GDP_per_head_EUR_2004%2C+Index_value_displayed_if_2004_not_available_then_2001_was_used&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="}
+		{name: "GDP", max:73931.54, unit: '$', atr: 'Index_value_displayed_if_2004_not_available_then_2001_was_used', url: "http://services.arcgis.com/LcQjj2sL7Txk9Lag/arcgis/rest/services/GDP_per_capita_in_2004_[EUR]/FeatureServer/0/query?where=city_name%3D%27{{CITY}}%27&objectIds=&time=&geometry=&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&distance=&units=esriSRUnit_Meter&outFields=value_in_2001%2C+GDP_per_head_EUR_2004%2C+Index_value_displayed_if_2004_not_available_then_2001_was_used&returnGeometry=true&maxAllowableOffset=&geometryPrecision=&outSR=&returnIdsOnly=false&returnCountOnly=false&returnExtentOnly=false&returnDistinctValues=false&orderByFields=&groupByFieldsForStatistics=&outStatistics=&resultOffset=&resultRecordCount=&returnZ=false&returnM=false&quantizationParameters=&f=pjson&token="}
 	];
 
 	
@@ -173,7 +175,7 @@ require([
 	}
 
 	function buildForm(){
-		var options = '<center><input placeholder="UrbanSounds" class="style-1" id="city-input" list="cities" onchange="getData()">\n<datalist id="cities">';
+		var options = '<center><input placeholder="UrbanSounds" class="city-input" id="city-input" list="cities" onchange="getData()">\n<datalist id="cities">';
 		for(i = 0; i< cities.length; i++){
 			options += '<option value="'+cities[i].name+'" name="'+i+'" id="'+i+'"></option>\n';
 		}
@@ -202,7 +204,7 @@ require([
 			var value = (JSON.parse(json)).features[0].attributes[search[i].atr];
 			console.log(value);
 			var norm_value = value / search[i].max;
-			result_str += "<td>"+search[i].name+ ": "+value+"</td>";
+			result_str += "<td>"+search[i].name+ ": "+value+" "+search[i].unit+"</td>";
 
 			result[i] = norm_value;
 		}
